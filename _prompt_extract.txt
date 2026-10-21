@@ -1,0 +1,93 @@
+LiveLingo
+Enhanced Build Plan & Low-Token Prompts
+For Cursor and Antigravity • Continue from your existing code
+English • Kannada • Hindi • Spanish • German • Tamil
+Important: prompts are deliberately small. Run one at a time and verify before continuing.
+1. What LiveLingo should become
+LiveLingo is a language-bridging communication app with two separate modes: (A) Face-to-Face Translator for people standing together, with ongoing listen → translate → speak; (B) Live Translation Call for two people joining an in-app voice/video meeting from separate devices. Both modes use the same six-language system and must translate in both directions.
+Languages: English (en), Kannada (kn), Hindi (hi), Spanish (es), German (de), and Tamil (ta). Keep language codes in one shared registry. The app must use the selected source and target language in the actual speech-recognition, translation, and voice-generation services—not only in the UI.
+2. Two-mode split UI
+Mode A — Face-to-Face Translator
+A large, clear two-sided layout: 'You speak' language on one side and 'They hear' language on the other.
+Start/Stop Listening, swap languages, mute playback, and clear transcript controls.
+Continuous or turn-based listening with visible states: Listening, Translating, Speaking, Paused, and Error.
+Support one shared device first. If the phone speaker is used, prevent generated translation audio from being re-captured as source speech; use headphones or push-to-talk as a fallback when echo cancellation is insufficient.
+Show original text and translated text separately. Never pretend a translation is complete while the provider is still processing.
+Mode B — Live Translation Call
+Create/Join Call using an invite link or room code; each participant selects the language they speak and the language they want to hear.
+Build a clean meeting-style screen with participant tiles, mic/camera controls if video is implemented, connection quality, captions/transcripts, and End Call.
+Translate each speaker's speech into the other participant's selected language and play generated speech to the correct remote participant.
+Keep translated audio out of the source transcription path. Use timestamps and cancellation to prevent delayed audio from playing over a newer utterance.
+Prioritize low perceived delay: stream partial STT where supported, translate short completed utterances, use streaming TTS where supported, and measure real end-to-end latency. Do not claim 'zero lag'.
+3. Natural, human-like translated voice
+Use high-quality neural TTS voices with natural pacing and pronunciation. Prefer streaming output, suitable voice choices for each language, and sentence-aware chunking that avoids cutting words or making every phrase sound robotic. Preserve meaning, names, and numbers. Where the provider supports it, use expressive prosody and adjustable speaking rate; do not imitate a specific real person's voice.
+Verify TTS support separately for English, Kannada, Hindi, Spanish, German, and Tamil. Some providers may not offer equally natural voices for every language. If a suitable voice is unavailable, disclose the limitation and provide translated text rather than faking speech.
+4. Do callers need the same Wi-Fi?
+No. Callers do not normally need to be on the same Wi-Fi. Each person needs a working internet connection; one can use Wi-Fi and the other mobile data. A real-time calling service uses internet media transport (typically WebRTC with appropriate connectivity infrastructure). Network quality, latency, firewalls, and mobile signal affect call quality. The face-to-face mode can work locally on one device, but cloud speech/translation services still need internet unless offline models are deliberately implemented.
+5. Suggested technical shape
+Frontend: React + TypeScript + Vite; responsive UI with two clearly separated mode cards.
+Calling: maintained WebRTC platform such as LiveKit for real in-app calls; first prove ordinary two-person audio works.
+Backend: secure API for short-lived call tokens and server-side STT/translation/TTS provider requests.
+Pipeline: source audio → STT with source locale → translation to listener locale → natural TTS → playback only to the intended listener.
+Language registry: en, kn, hi, es, de, ta; track verified STT, translation, TTS voice, and provider limitations separately.
+Security: provider keys only on the server; use environment variables, validation, rate limits, safe logs, and cleanup.
+Vercel: use it for the frontend when ready. A persistent real-time media server or long-running streaming pipeline may need a separate hosted service; do not assume Vercel serverless functions alone can host the entire call stack.
+6. Build and deployment order
+A — Inspect existing code: Do not recreate the project. Identify which two prompts/features are already implemented and list the files and gaps.
+B — Complete the UI split: Add Face-to-Face and Live Translation Call as two obvious choices; keep existing working code.
+C — Prove real calling: Make two separate browser sessions connect and hear each other before adding translation.
+D — Prove one full language pair: Test real STT → translation → natural TTS → correct playback in both directions.
+E — Expand to six languages: Test English, Kannada, Hindi, Spanish, German, and Tamil individually, then each enabled directed pair.
+F — Smoothness and reliability: Test interruptions, echo, noisy environments, slow networks, reconnects, provider failures, and call ending.
+G — Deploy only after local acceptance: Deploy frontend to Vercel and host any persistent backend/media service where its runtime is supported; configure production environment variables and HTTPS.
+H — Test deployed usability: Test on desktop and mobile, two different networks, microphone permissions, invite links, all language modes, and real latency.
+7. How to avoid exhausting IDE tokens
+Run only one prompt at a time. Do not paste the entire document into Cursor or Antigravity.
+Tell the IDE to inspect the current files and modify only the smallest necessary set of files.
+Ask for a short plan first; approve it, then ask for implementation.
+Ask for a concise summary: files changed, commands to run, what passed, and the next single step.
+Do not ask it to rewrite working features or dump every file into chat. Ask it to report only relevant diffs and errors.
+If context is running low, start a new chat in the same workspace and paste the compact project handoff prompt below.
+8. Cursor prompts — continue from the two prompts already implemented
+The following prompts assume you have already implemented two prompts from the previous document. They explicitly tell the IDE to inspect the current state and continue instead of rebuilding from scratch.
+Cursor Prompt 3 — Inspect and split the two modes
+Continue the existing LiveLingo code; do not recreate the project. Inspect the current files and briefly identify what is already implemented. Add a polished home screen with two clear modes: “Face-to-Face Translator” and “Live Translation Call”. Keep the design like a premium communication product, not an AI dashboard: warm ivory, charcoal, cobalt accents, whitespace, restrained shadows, clear typography, subtle motion. Keep the six languages: en, kn, hi, es, de, ta. Implement only this UI step, reuse existing components, and report changed files plus one test command.
+Cursor Prompt 4 — Face-to-face translation mode
+Implement only the Face-to-Face Translator in the existing code. Users choose “You speak” and “They hear” from English, Kannada, Hindi, Spanish, German, and Tamil. Add start/stop listening, swap languages, original/translated transcript, mute translated playback, and honest Listening/Translating/Speaking/Error states. Connect to existing provider code if it exists; otherwise create a small typed adapter interface and clearly mark the missing integration. Prevent speaker output from looping back into STT; use echo cancellation/headphones/push-to-talk fallback as needed. Do not touch the calling mode. Summarize changes and how to test.
+Cursor Prompt 5 — Make translated voice sound natural
+Improve the existing TTS path only. Inspect the current provider and verify its official support for en, kn, hi, es, de, ta. Prefer high-quality neural voices, streaming audio where supported, natural pacing, correct locale pronunciation, and sensible sentence chunking. Preserve names and numbers. Do not imitate a real person's voice or fake unsupported voices. If a language has no suitable voice, show translated text and a clear limitation. Keep changes small; report provider capabilities, files changed, and a short test.
+Cursor Prompt 6 — Real calling, no same-Wi-Fi requirement
+Implement or finish the Live Translation Call mode using the project's existing call stack if present; do not replace working infrastructure without explaining why. Use a maintained WebRTC service such as LiveKit if calling is not yet implemented. Two participants should join by room link/code from different networks; they do not need the same Wi-Fi, only working internet. Add secure short-lived tokens on the backend, mic permissions, mute, connection/reconnect states, and cleanup. First verify real audio between two browser sessions without translation. Do not claim it works until tested.
+Cursor Prompt 7 — Bidirectional translation in calls
+Add translation to the working call without breaking normal audio. For each speaker: source audio → STT in their chosen language → translation into the other participant's chosen language → natural TTS → playback only to that participant. Support English en, Kannada kn, Hindi hi, Spanish es, German de, Tamil ta, but expose only combinations verified by the chosen providers. Keep translated output out of the source STT input. Prefer streaming/partial processing where reliable, cancel stale utterances, measure real latency, and never claim zero lag. Make this one scoped change and give manual two-browser test steps.
+Cursor Prompt 8 — Test language support and smoothness
+Do a test-focused pass; avoid a broad rewrite. Create a compact matrix for the six languages and every enabled directed language pair. Verify actual STT, translation, TTS voice, and correct playback. Test names/numbers, pauses, noisy audio, interruptions, echo, slow internet, reconnects, permission denial, provider errors, and call end. Record measured latency and mark each pair passed/failed/unverified. Fix only the highest-priority failure first. Report results in a short table.
+Cursor Prompt 9 — Production and Vercel readiness
+Only after local face-to-face and calling tests pass, prepare deployment. Inspect the actual project and identify what can run on Vercel and what needs a separate persistent backend/media host. Do not force long-lived WebRTC/media streams into serverless functions if the runtime cannot support them. Add production environment-variable documentation, secure CORS/origin settings, HTTPS requirements, safe logs, and exact deploy steps. Deploy the frontend to Vercel if the project is ready; otherwise give a precise blocker list. Test the deployed app with two devices on different networks and report verified results only.
+9. Antigravity prompts — low-token sequence
+Antigravity Prompt 3 — Continue and design the split
+Continue the existing LiveLingo workspace; do not regenerate it. Inspect what is already done and identify the next small step. Create two clear product paths: Face-to-Face Translator and Live Translation Call. Use a refined, human-designed communication-app UI, not an AI dashboard. Keep English, Kannada, Hindi, Spanish, German, and Tamil. Implement only the split/home navigation, reuse current components, and report changed files and how to run it.
+Antigravity Prompt 4 — Face-to-face + natural voice
+Implement the Face-to-Face Translator only. Add source/target selectors for en, kn, hi, es, de, ta, start/stop listening, swap, separate original/translated text, and honest status states. Use the existing provider if present; otherwise define a small adapter and identify missing credentials/integration. Improve TTS toward natural neural voices and streaming where supported, but verify actual language/voice availability. Prevent speaker playback from being transcribed again. Keep the call mode untouched and report a concise test checklist.
+Antigravity Prompt 5 — Real calls on different networks
+Finish the Live Translation Call mode using existing infrastructure where possible. Use maintained WebRTC calling (for example LiveKit) if needed, short-lived server-issued tokens, real mic permissions, mute, reconnect, and cleanup. Callers do not need the same Wi-Fi; they need working internet and suitable network conditions. First test real two-person audio on two browser sessions and different networks. Do not add translation until this works and do not claim untested success.
+Antigravity Prompt 6 — Six-language low-delay pipeline
+Add bidirectional STT → translation → natural TTS to the verified call. Required languages: English en, Kannada kn, Hindi hi, Spanish es, German de, Tamil ta. Verify current provider support for every enabled language and voice. Route translated audio only to the intended listener; prevent feedback loops; cancel stale audio. Use streaming/partial processing only when stable and measure actual latency instead of promising zero lag. Implement one small step, test it, then summarize changed files and next action.
+Antigravity Prompt 7 — Test, then deploy
+Test both modes and every enabled directed language pair. Record STT, translation, voice, routing, echo, latency, permissions, reconnect, and error results. Fix critical failures before deployment. Then inspect the runtime: deploy the frontend to Vercel if suitable, but use a compatible separate host for persistent media/backend services if needed. Configure production secrets and HTTPS. Test the deployed app on desktop/mobile and two different networks. Do not report features as working unless actually verified.
+10. Compact handoff prompt for a fresh IDE chat
+Paste this only if you start a new Cursor/Antigravity chat
+Project: LiveLingo, a from-scratch in-app speech translation product. Continue from current workspace; do not recreate or rewrite working features. Two modes: (1) Face-to-Face Translator with ongoing listen/translate/speak, (2) Live Translation Call between users on different networks. Languages: English en, Kannada kn, Hindi hi, Spanish es, German de, Tamil ta. Aim for natural neural TTS and low perceived latency, but never promise zero lag or fake support. UI should look like a premium communication app, not an AI dashboard. Verify provider support for STT, translation, and TTS per language. Keep secrets server-side, prevent audio feedback loops, test one small change at a time. Deploy frontend to Vercel only after local acceptance; persistent real-time media/backend may need a separate host. First inspect current files, then propose only the next small step.
+11. Final acceptance checklist
+☐ Home screen clearly separates Face-to-Face Translator and Live Translation Call.
+☐ All six languages appear in selectors and actually control provider requests.
+☐ Face-to-face mode continuously translates with a usable echo/feedback prevention strategy.
+☐ Two callers can join from different networks; same Wi-Fi is not required.
+☐ Translated voice sounds natural for each supported language and uses verified voices.
+☐ Call translation is bidirectional and routed only to the intended participant.
+☐ Real latency is measured; no false “zero lag” claim.
+☐ Every enabled language pair is tested and marked passed, failed, or unverified.
+☐ Local tests pass before Vercel deployment; production secrets and HTTPS are configured.
+☐ Deployed usability is checked on mobile and desktop, including two devices on different networks.
+12. One practical warning
+Real-time translated calling with natural voices is technically demanding. Build in layers and test real audio early. Kannada and Tamil voice/STT availability can vary by provider. A good UI alone does not mean translation works; only advertise a language pair after an end-to-end test.
